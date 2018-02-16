@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BridgePoint MC C Source Tests
+Bundle-SymbolicName: org.xtuml.bp.mc.c.source.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.xtuml.bp.mc.c.source.test.Activator
+Bundle-Vendor: xtUML.org
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.junit,
+ org.eclipse.core.resources
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
