@@ -11,15 +11,18 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.junit.After;
 import org.junit.Before;
 import org.xtuml.bp.test.common.BaseTest;
 
 public abstract class MCCSourceTest extends BaseTest {
 
-    private static final String TOOLS_DIR = "tools/mc/bin";
     private static final String MCMC = "mcmc";
     private static final String MCMC_DISABLED = "_mcmc";
+    
+    private static IPath toolsDir = null;
 
     private String output;
     private String error;
@@ -37,6 +40,16 @@ public abstract class MCCSourceTest extends BaseTest {
         String projectName = getProjectName();
         assertTrue( "Project name cannot be empty.", null != projectName && !"".equals( projectName ) );
         loadProject( projectName );
+        // find the tools directory
+        if ( null == toolsDir ) {
+            assertNotNull( "Null project handle.", project );
+            IFile mcLaunchFile = project.getFile( ".externalToolBuilders/Model Compiler.launch" );
+            assertNotNull( "Null file handle.", mcLaunchFile );
+            assertTrue( "Model compiler launch configuration file could not be found.", mcLaunchFile.exists() );
+            ILaunchConfiguration mcLaunch = DebugPlugin.getDefault().getLaunchManager().getLaunchConfiguration( mcLaunchFile );
+            toolsDir = new Path( mcLaunch.getAttribute( "org.eclipse.ui.externaltools.ATTR_LOCATION", "" ) ).removeLastSegments( 1 );
+            assertTrue( "Could not locate tools directory.", toolsDir.toFile().exists() && toolsDir.toFile().isDirectory() );
+        }
         // enable mcmc by default
         setMcmcEnabled( true );
     }
@@ -127,8 +140,6 @@ public abstract class MCCSourceTest extends BaseTest {
     // set whether or not the model based portion
     // of the C model compiler is enabled
     protected void setMcmcEnabled( boolean enable ) {
-        IPath toolsDir = new Path( System.getProperty( "eclipse.home.location" ).replaceAll( "file:", "" ) ).append( new Path( TOOLS_DIR ) );
-        assertTrue( "Could not locate tools directory.", toolsDir.toFile().exists() && toolsDir.toFile().isDirectory() );
         File enabledMcmc = toolsDir.append( MCMC ).toFile();
         File disabledMcmc = toolsDir.append( MCMC_DISABLED ).toFile();
         if ( enable ) {
