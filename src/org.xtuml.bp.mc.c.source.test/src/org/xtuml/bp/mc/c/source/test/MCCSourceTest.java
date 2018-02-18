@@ -15,6 +15,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.junit.After;
 import org.junit.Before;
+import org.xtuml.bp.mc.c.source.MCNature;
 import org.xtuml.bp.test.common.BaseTest;
 
 public abstract class MCCSourceTest extends BaseTest {
@@ -40,9 +41,11 @@ public abstract class MCCSourceTest extends BaseTest {
         String projectName = getProjectName();
         assertTrue( "Project name cannot be empty.", null != projectName && !"".equals( projectName ) );
         loadProject( projectName );
+        // assure that this is a MC-3020 project
+        assertNotNull( "Null project handle.", project );
+        assertTrue( "Project is not a MC C source project.", project.hasNature( MCNature.MC_NATURE_ID ) );
         // find the tools directory
         if ( null == toolsDir ) {
-            assertNotNull( "Null project handle.", project );
             IFile mcLaunchFile = project.getFile( ".externalToolBuilders/Model Compiler.launch" );
             assertNotNull( "Null file handle.", mcLaunchFile );
             assertTrue( "Model compiler launch configuration file could not be found.", mcLaunchFile.exists() );
